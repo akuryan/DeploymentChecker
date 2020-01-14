@@ -3,6 +3,8 @@ This repository is a result of work I have done for a long time as DevOps. Here 
 
 # Libraries
 
-## RobotsTxt
+## RobotsTxt check
 
-RobotsTxt originated from [Nuget package](https://www.nuget.org/packages/RobotsTxt), but then it was further modified and slightly improved by me to fit my goals.
+RobotsTxt check uses library [RobotsTxt](./src/Libraries) to check both robots.txt file and validate sitemap.xml.
+
+Implementation:
