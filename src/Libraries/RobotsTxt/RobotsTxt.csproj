@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net452;netcoreapp3.1</TargetFrameworks>
+	<AssemblyTitle>RobotsTxt</AssemblyTitle>
+	<AssemblyVersion>1.0.0</AssemblyVersion>
+	<Description>A robots.txt parser for .NET</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="Properties\" />
+  </ItemGroup>
+
+</Project>
