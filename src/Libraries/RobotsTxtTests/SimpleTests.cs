@@ -56,7 +56,8 @@ namespace RobotsTxtTests
         {
             string s = "User-agent: *" + nl + "Sitemap: /sitemap.xml";
             Robots r = new Robots(s);
-            Assert.AreEqual(1, r.Sitemaps.Count);
+            // sitemap shall be an absolute URL - so, it is not valid to add Sitemap with incorrect value to collection
+            Assert.AreEqual(0, r.Sitemaps.Count);
         }
 
         [Test, Category("Constructor")]
@@ -79,10 +80,11 @@ namespace RobotsTxtTests
             Assert.AreEqual("http://foo.com/sitemap.xml", r.Sitemaps[0].Value);
             s = "User-agent: *" + nl + "Sitemap: /sitemap.xml";
             r = new Robots(s);
-            Assert.Null(r.Sitemaps[0].Url);
+            // sitemap shall be an absolute URL - so, it is not valid to add Sitemap with incorrect value to collection
+            Assert.AreEqual(0, r.Sitemaps.Count);
             s = "User-agent: *" + nl + "Sitemap: /sitemap.xml" + nl + "Sitemap: http://foo.com/sitemap.xml";
             r = new Robots(s);
-            Assert.AreEqual(2, r.Sitemaps.Count);
+            Assert.AreEqual(1, r.Sitemaps.Count);
         }
 
         [Test, Category("Constructor")]
