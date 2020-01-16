@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "RobotsTxt.Checker": {
+      "commandName": "Project",
+      "commandLineArgs": "--webappurls dobryak.org"
+    }
+  }
+}

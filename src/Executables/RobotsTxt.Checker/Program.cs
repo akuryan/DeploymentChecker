@@ -29,7 +29,7 @@ namespace RobotsTxt.Checker
 
         private static void Run(Options options)
         {
-            IEnumerable<RobotsTxtReport> checkResults = from url in options.WebAppUrls.AsParallel().WithDegreeOfParallelism(ProcessorsCount) select Methods.Checker.CheckRobotsTxt(url, options.CrawlingDenied);
+            IEnumerable<RobotsTxtReport> checkResults = from url in options.WebAppUrls.AsParallel().WithDegreeOfParallelism(ProcessorsCount) where !string.IsNullOrWhiteSpace(url) select Methods.Checker.CheckRobotsTxt(url, options.CrawlingDenied, options.PerformSitemapValidation);
 
             RobotsTxtReport[] reports = checkResults.ToArray();
 
@@ -45,27 +45,11 @@ namespace RobotsTxt.Checker
             bool exitWithError = false;
             foreach (var report in reports)
             {
-                exitWithError = !exitWithError ? report.CheckStatus : exitWithError;
-                if (report.CheckStatus)
+                exitWithError = !exitWithError ? !report.CheckStatus : exitWithError;
+                reportString.AppendLine(CheckStatusReport(report.CheckStatus, report.Url));
+                if (options.PerformSitemapValidation)
                 {
-                    reportString.AppendLine($"Robots.txt at {report.Url} is correct.");
-                    if (report.Robots.Sitemaps.Any())
-                    {
-                        var sitemapReportString = " ";
-                        if (!report.SitemapsIsValid)
-                        {
-                            sitemapReportString = " not ";
-                        }
-                        reportString.AppendLine($"Sitemaps, defined at robots.txt at {report.Url} is{sitemapReportString}valid");
-                    }
-                    else
-                    {
-                        reportString.AppendLine($"There is no sitemaps defined at robots.txt at {report.Url}");
-                    }
-                }
-                else
-                {
-                    reportString.AppendLine($"Robots.txt at {report.Url} is not correct.");
+                    reportString.Append(SitemapValidationStatus(report.Robots.Sitemaps.Any(), report.SitemapsIsValid, report.Url));
                 }
             }
 
@@ -74,6 +58,25 @@ namespace RobotsTxt.Checker
             {
                 Environment.Exit(-1);
             }
+        }
+
+        private static string CheckStatusReport(bool status, string url)
+        {
+            return status ? $"Robots.txt at {url} is correct." : $"Robots.txt at {url} is not correct.";
+        }
+
+        private static string SitemapValidationStatus(bool sitemapsPresent, bool sitemapsIsValid, string url)
+        {
+            if (!sitemapsPresent)
+            {
+                return $"There is no sitemaps defined at robots.txt at {url}";
+            }
+            var sitemapReportString = " ";
+            if (!sitemapsIsValid)
+            {
+                sitemapReportString = " not ";
+            }
+            return $"Sitemaps, defined at robots.txt at {url} is{sitemapReportString}valid";
         }
     }
 }

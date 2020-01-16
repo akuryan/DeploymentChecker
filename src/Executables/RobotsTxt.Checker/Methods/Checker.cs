@@ -11,7 +11,7 @@ namespace RobotsTxt.Checker.Methods
 {
     public static class Checker
     {
-        public static RobotsTxtReport CheckRobotsTxt(string url, bool isNoAllowRuleExpected)
+        public static RobotsTxtReport CheckRobotsTxt(string url, bool isNoAllowRuleExpected, bool validateSitemaps)
         {
             var report = new RobotsTxtReport();
             var siteUrl = url.Contains('?') ? url.Split('?')[0] : url;
@@ -20,29 +20,28 @@ namespace RobotsTxt.Checker.Methods
             bool robotsTxtExists;
             var robotsContent = string.Empty;
 
-            using (var client = new WebClient())
+            try
             {
-                try
-                {
-                    robotsContent = client.DownloadString(uriResult);
-                    //something was downloaded, and we need to check, if it is not empty now
-                    robotsTxtExists = !string.IsNullOrWhiteSpace(robotsContent);
-                }
-                catch (Exception exception)
-                {
-                    Console.WriteLine($"Exception received when trying to download {uriResult}");
-                    Console.WriteLine($"Exception: {exception.Message}");
-                    Console.WriteLine($"Exception stracktrace {exception.StackTrace}");
-                    robotsTxtExists = false;
-                }
+                robotsContent = Helpers.NetworkHelper.GetString(uriResult);
+                //something was downloaded, and we need to check, if it is not empty now
+                robotsTxtExists = !string.IsNullOrWhiteSpace(robotsContent);
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine($"Exception received when trying to download {uriResult}");
+                Console.WriteLine($"Exception: {exception.Message}");
+                Console.WriteLine($"Exception stracktrace {exception.StackTrace}");
+                robotsTxtExists = false;
             }
 
             var robotsFile = robotsTxtExists ? Robots.Load(robotsContent) : Robots.Load(string.Empty);
+            //robotsFile.AllowRuleImplementation = AllowRuleImplementation.AllowOverrides;
 
             report.Url = url;
             report.CheckStatus = GetCheckStatus(robotsFile, isNoAllowRuleExpected);
             report.RobotsTxtExists = robotsTxtExists;
-            report.SitemapsIsValid = CheckSitemapIsValid(robotsFile);
+            report.SitemapsIsValid = validateSitemaps ? CheckSitemapIsValid(robotsFile) : false;
+            report.Robots = robotsFile;
             return report;
         }
 
@@ -73,7 +72,7 @@ namespace RobotsTxt.Checker.Methods
             if (!urlName.Trim().StartsWith("http"))
             {
                 Console.WriteLine($"url {urlName} does not start with http or https.");
-                Uri.TryCreate(UriName(string.Concat("http://", urlName), append), UriKind.Absolute, out uriResult);
+                Uri.TryCreate(UriName(string.Concat("https://", urlName), append), UriKind.Absolute, out uriResult);
             }
             else
             {

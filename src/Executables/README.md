@@ -8,6 +8,8 @@ Executable to check robots.txt and validate sitemap.xml (if correct absolute lin
 
 1.  --crawlingdenied    (Default: false) Define, if robots.txt shall deny all crawling of web app. Default value is false, e.g. crawling shall be allowed.
 
+1. --performsitemapvalidation    (Default: false) Defines, if sitemap, defined in robots.txt, should be validated.
+
 1.  --help              Display this help screen.
 
 1.  --version           Display version information.
