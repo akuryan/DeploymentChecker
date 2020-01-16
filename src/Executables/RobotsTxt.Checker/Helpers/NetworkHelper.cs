@@ -13,10 +13,10 @@ namespace RobotsTxt.Checker.Helpers
     {
         public static string GetString(Uri uri)
         {
-            var webRequest = (HttpWebRequest)WebRequest.Create(uri);
-
-            var httpHandler = new HttpClientHandler();
-            httpHandler.AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip;
+            var httpHandler = new HttpClientHandler
+            {
+                AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip
+            };
             var httpClient = new HttpClient(httpHandler);
 
             var request = new HttpRequestMessage { RequestUri = uri, Method = HttpMethod.Get };

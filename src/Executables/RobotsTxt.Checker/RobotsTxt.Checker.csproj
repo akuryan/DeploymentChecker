@@ -13,10 +13,4 @@
     <ProjectReference Include="..\..\Libraries\RobotsTxt\RobotsTxt.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Update="Files\sitemap.xsd">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-
 </Project>

@@ -29,7 +29,7 @@ namespace RobotsTxt.Checker
 
         private static void Run(Options options)
         {
-            IEnumerable<RobotsTxtReport> checkResults = from url in options.WebAppUrls.AsParallel().WithDegreeOfParallelism(ProcessorsCount) where !string.IsNullOrWhiteSpace(url) select Methods.Checker.CheckRobotsTxt(url, options.CrawlingDenied, options.PerformSitemapValidation);
+            IEnumerable<RobotsTxtReport> checkResults = from url in options.WebAppUrls.AsParallel().WithDegreeOfParallelism(ProcessorsCount) where !string.IsNullOrWhiteSpace(url) select Methods.Checker.CheckRobotsTxt(url, options.CrawlingDenied);
 
             RobotsTxtReport[] reports = checkResults.ToArray();
 
@@ -47,9 +47,10 @@ namespace RobotsTxt.Checker
             {
                 exitWithError = !exitWithError ? !report.CheckStatus : exitWithError;
                 reportString.AppendLine(CheckStatusReport(report.CheckStatus, report.Url));
-                if (options.PerformSitemapValidation)
+                if (report.Robots.Sitemaps.Any())
                 {
-                    reportString.Append(SitemapValidationStatus(report.Robots.Sitemaps.Any(), report.SitemapsIsValid, report.Url));
+                    var reportData = report.SitemapsIsAccessible ? " " : " not ";
+                    reportString.AppendLine($"Sitemaps, defined at robots.txt at {report.Url} could{reportData}be downloaded.");
                 }
             }
 
@@ -63,20 +64,6 @@ namespace RobotsTxt.Checker
         private static string CheckStatusReport(bool status, string url)
         {
             return status ? $"Robots.txt at {url} is correct." : $"Robots.txt at {url} is not correct.";
-        }
-
-        private static string SitemapValidationStatus(bool sitemapsPresent, bool sitemapsIsValid, string url)
-        {
-            if (!sitemapsPresent)
-            {
-                return $"There is no sitemaps defined at robots.txt at {url}";
-            }
-            var sitemapReportString = " ";
-            if (!sitemapsIsValid)
-            {
-                sitemapReportString = " not ";
-            }
-            return $"Sitemaps, defined at robots.txt at {url} is{sitemapReportString}valid";
         }
     }
 }

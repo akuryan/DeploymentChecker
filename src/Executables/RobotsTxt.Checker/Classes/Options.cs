@@ -10,8 +10,5 @@ namespace RobotsTxt.Checker.Classes
 
         [Option(Default = false, HelpText = "Define, if robots.txt shall deny all crawling of web app. Default value is false, e.g. crawling shall be allowed.")]
         public bool CrawlingDenied { get; set; }
-
-        [Option(Default = false, HelpText = "Defines, if sitemap, defined in robots.txt, should be validated.")]
-        public bool PerformSitemapValidation { get; set; }
     }
 }

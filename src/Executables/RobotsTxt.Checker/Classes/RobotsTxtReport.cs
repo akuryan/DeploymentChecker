@@ -11,10 +11,7 @@
         /// </summary>
         public bool CheckStatus { get; set; }
 
-        /// <summary>
-        /// Indicates that Sitemaps in robots.txt are valid
-        /// </summary>
-        public bool SitemapsIsValid { get; set; }
+        public bool SitemapsIsAccessible { get; set; }
 
         public Robots Robots { get; set; }
     }
