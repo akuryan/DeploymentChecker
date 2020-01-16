@@ -7,4 +7,4 @@ This repository is a result of work I have done for a long time as DevOps. Here 
 
 RobotsTxt check uses library [RobotsTxt](./src/Libraries) to check both robots.txt file and validate sitemap.xml.
 
-Implementation:
+It is built as executable file with [parameters](./src/Executables#robotstxtchecker) and will be packed as NuGet package.
