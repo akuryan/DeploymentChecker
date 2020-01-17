@@ -15,7 +15,7 @@
     <language>en-US</language>
     <!-- NuGet package dependency -->
     <dependencies>
-      <dependency id="CommandLineParser" version="^2.7.82" />
+      <dependency id="CommandLineParser" version="2.7.82" />
     </dependencies>
   </metadata>
   <files>
