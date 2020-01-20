@@ -9,7 +9,7 @@
     <description>
       Small utility, used to check robots.txt on web app and make sure that it is valid. RobotsTxt check is based on https://www.nuget.org/packages/RobotsTxt, but this project is no longer maintained, so I copied it for myself and introduced some useful (as I see them) improvements
     </description>
-    <projectUrl>https://github.com/akuryan/DeploymentChecker/tree/robotsTxtParser/src/Executables/RobotsTxt.Checker</projectUrl>
+    <projectUrl>https://github.com/akuryan/DeploymentChecker/tree/master/src/Executables/RobotsTxt.Checker</projectUrl>
     <copyright>Copyright 2020</copyright>
     <tags>utility, robots.txt, check</tags>
     <language>en-US</language>
