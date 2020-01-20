@@ -1,4 +1,5 @@
 ﻿using RobotsTxt.Checker.Classes;
+using Shared.Helpers;
 using System;
 using System.Linq;
 
@@ -75,18 +76,7 @@ namespace RobotsTxt.Checker.Methods
         /// <returns></returns>
         private static Uri RobotsTxtUri(string suppliedHost)
         {
-            var url = suppliedHost.Contains('?') ? suppliedHost.Split('?')[0] : suppliedHost;
-            url = url.Trim();
-            Uri parsedUri;
-            if (!url.Trim().StartsWith("http"))
-            {
-                Console.WriteLine($"Url {url} does not start with http or https.");
-                Uri.TryCreate(string.Concat("https://", url), UriKind.Absolute, out parsedUri);
-            }
-            else
-            {
-                Uri.TryCreate(url, UriKind.Absolute, out parsedUri);
-            }
+            Uri parsedUri = new Uri(suppliedHost.PrepareParceableHostName());
 
             if (parsedUri == null)
             {

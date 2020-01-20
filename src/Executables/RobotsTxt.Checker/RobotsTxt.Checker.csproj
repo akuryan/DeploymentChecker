@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Libraries\RobotsTxt\RobotsTxt.csproj" />
+    <ProjectReference Include="..\..\Libraries\Shared\Shared.csproj" />
   </ItemGroup>
 
 </Project>

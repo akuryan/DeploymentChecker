@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Shared.Helpers;
+using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
@@ -29,9 +30,10 @@ namespace RobotsTxt.Checker.Helpers
         /// <returns></returns>
         public static string GetString(Uri uri, string hostHeader)
         {
+            var data = string.Empty;
             if (uri == null)
             {
-                return string.Empty;
+                return data;
             }
 
             var httpHandler = new HttpClientHandler
@@ -59,20 +61,13 @@ namespace RobotsTxt.Checker.Helpers
 
                 if (!string.IsNullOrWhiteSpace(hostHeader))
                 {
-                    var header = hostHeader;
-
-                    if (header.IndexOfAny(new[] { '/' }) != -1)
-                    {
-
-                    }
+                    request.Headers.Host = hostHeader.CreateValidHostHeader();
                 }
+
+                response = httpClient.SendAsync(request).Result;
+                data = response.Content.ToString();
             }
 
-            var data = string.Empty;
-            using (var client = new WebClient())
-            {
-                data = client.DownloadString(uri);
-            }
             return data;
         }
     }
