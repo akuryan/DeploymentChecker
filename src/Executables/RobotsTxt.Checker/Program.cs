@@ -29,7 +29,7 @@ namespace RobotsTxt.Checker
 
         private static void Run(Options options)
         {
-            IEnumerable<RobotsTxtReport> checkResults = from url in options.WebAppUrls.AsParallel().WithDegreeOfParallelism(ProcessorsCount) where !string.IsNullOrWhiteSpace(url) select Methods.Checker.CheckRobotsTxt(url, options.CrawlingDenied);
+            IEnumerable<RobotsTxtReport> checkResults = from url in options.WebAppUrls.AsParallel().WithDegreeOfParallelism(ProcessorsCount) where !string.IsNullOrWhiteSpace(url) select Methods.Checker.CheckRobotsTxt(url, options);
 
             RobotsTxtReport[] reports = checkResults.ToArray();
 

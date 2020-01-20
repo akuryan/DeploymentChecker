@@ -1,42 +1,37 @@
 ﻿using RobotsTxt.Checker.Classes;
+using Shared.Helpers;
 using System;
-using System.IO;
 using System.Linq;
-using System.Net;
-using System.Xml;
-using System.Xml.Linq;
-using System.Xml.Schema;
 
 namespace RobotsTxt.Checker.Methods
 {
     public static class Checker
     {
-        public static RobotsTxtReport CheckRobotsTxt(string url, bool isNoAllowRuleExpected)
+        public static RobotsTxtReport CheckRobotsTxt(string url, Options providedOptions)
         {
-            var siteUrl = url.Contains('?') ? url.Split('?')[0] : url;
-            siteUrl = siteUrl.Trim();
-            Uri uriResult = ResultingUri(siteUrl, Constants.RobotsTxtName);
+            var robotsTxtHost = string.IsNullOrWhiteSpace(providedOptions.ServerHostName) ? url : providedOptions.ServerHostName;
+            Uri robotsTxtUri = RobotsTxtUri(robotsTxtHost);
             bool robotsTxtExists;
             var robotsContent = string.Empty;
 
             try
             {
-                robotsContent = Helpers.NetworkHelper.GetString(uriResult);
+                robotsContent = string.IsNullOrWhiteSpace(providedOptions.ServerHostName) ? Helpers.NetworkHelper.GetString(robotsTxtUri) : Helpers.NetworkHelper.GetString(robotsTxtUri, url);
                 //something was downloaded, and we need to check, if it is not empty now
                 robotsTxtExists = !string.IsNullOrWhiteSpace(robotsContent);
             }
             catch (Exception exception)
             {
-                Console.WriteLine($"Exception received when trying to download {uriResult}");
+                Console.WriteLine($"Exception received when trying to download {robotsTxtUri.ToString()}");
                 Console.WriteLine($"Exception: {exception.Message}");
                 Console.WriteLine($"Exception stracktrace {exception.StackTrace}");
                 robotsTxtExists = false;
             }
 
             var robotsFile = robotsTxtExists ? Robots.Load(robotsContent) : Robots.Load(string.Empty);
-            var getCheckStatus = GetCheckStatus(robotsFile, isNoAllowRuleExpected);
+            var getCheckStatus = GetCheckStatus(robotsFile, providedOptions.CrawlingDenied);
             var sitemapsIsAccessible = CheckSitemapIsAccessible(robotsFile);
-            if (robotsFile.Sitemaps.Any())
+            if (HaveSitemaps(robotsFile))
             {
                 //if robots.txt check is OK, but sitemaps, defined in it is not accessible - we shall fail the check
                 getCheckStatus = getCheckStatus ? sitemapsIsAccessible : getCheckStatus;
@@ -74,31 +69,39 @@ namespace RobotsTxt.Checker.Methods
             return checkStatus;
         }
 
-        private static Uri ResultingUri(string urlName, string append)
+        /// <summary>
+        /// According to https://support.google.com/webmasters/answer/6062596?hl=en - robots.txt must be located only at root of web app
+        /// </summary>
+        /// <param name="suppliedHost"></param>
+        /// <returns></returns>
+        private static Uri RobotsTxtUri(string suppliedHost)
         {
-            Uri uriResult;
-            if (!urlName.Trim().StartsWith("http"))
+            Uri parsedUri = new Uri(suppliedHost.PrepareParceableHostName());
+
+            if (parsedUri == null)
             {
-                Console.WriteLine($"url {urlName} does not start with http or https.");
-                Uri.TryCreate(UriName(string.Concat("https://", urlName), append), UriKind.Absolute, out uriResult);
-            }
-            else
-            {
-                Uri.TryCreate(UriName(urlName, append), UriKind.Absolute, out uriResult);
+                Console.WriteLine($"Could not parse {suppliedHost} as a hostname.");
+                return null;
             }
 
-            return uriResult;
+            var robotsTxtUrl = string.Concat(parsedUri.Scheme, "://", parsedUri.DnsSafeHost, "/", Constants.RobotsTxtName);
+            return new Uri(robotsTxtUrl, UriKind.Absolute);
         }
 
-        private static string UriName(string siteUrlToTest, string append)
+        private static bool HaveSitemaps(Robots robotsFile)
         {
-            return siteUrlToTest.EndsWith("/", StringComparison.InvariantCultureIgnoreCase) ? string.Concat(siteUrlToTest, append) : string.Concat(siteUrlToTest, "/", append);
+            if (robotsFile.Sitemaps != null)
+            {
+                return robotsFile.Sitemaps.Any();
+            }
+
+            return false;
         }
 
         private static bool CheckSitemapIsAccessible(Robots robotsFile)
         {
             var isAccessible = false;
-            if (robotsFile.Sitemaps != null && robotsFile.Sitemaps.Any())
+            if (HaveSitemaps(robotsFile))
             {
                 foreach (Sitemap sitemapUrl in robotsFile.Sitemaps)
                 {

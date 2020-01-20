@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Shared.Helpers;
+using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
@@ -11,35 +12,65 @@ namespace RobotsTxt.Checker.Helpers
     /// </summary>
     public static class NetworkHelper
     {
+        /// <summary>
+        /// Retrieves file at uri, passed as parameter
+        /// </summary>
+        /// <param name="uri">File to download</param>
+        /// <returns></returns>
         public static string GetString(Uri uri)
         {
+            return GetString(uri, string.Empty);
+        }
+
+        /// <summary>
+        /// If hostheader is not empty - constructs request to uri, but replaces Host in request headeres with hostheader value
+        /// </summary>
+        /// <param name="uri">File to download</param>
+        /// <param name="hostHeader">Sets header Host in request to this value</param>
+        /// <returns></returns>
+        public static string GetString(Uri uri, string hostHeader)
+        {
+            var data = string.Empty;
+            if (uri == null)
+            {
+                return data;
+            }
+
             var httpHandler = new HttpClientHandler
             {
                 AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip
             };
-            var httpClient = new HttpClient(httpHandler);
 
-            var request = new HttpRequestMessage { RequestUri = uri, Method = HttpMethod.Get };
-
-            var response = httpClient.SendAsync(request).Result;
-
-            var statusCode = (int)response.StatusCode;
-
-            if (statusCode >= 300 && statusCode <= 399)
+            using (var httpClient = new HttpClient(httpHandler))
             {
-                Uri redirectUri = response.Headers.Location;
-                if (!redirectUri.IsAbsoluteUri)
+                var request = new HttpRequestMessage { RequestUri = uri, Method = HttpMethod.Get };
+
+                if (!string.IsNullOrWhiteSpace(hostHeader))
                 {
-                    redirectUri = new Uri(request.RequestUri.GetLeftPart(UriPartial.Authority) + redirectUri);
+                    request.Headers.Host = hostHeader.CreateValidHostHeader();
                 }
-                return GetString(redirectUri);
+
+                var response = httpClient.SendAsync(request).Result;
+
+                var statusCode = (int)response.StatusCode;
+
+                if (statusCode >= 300 && statusCode <= 399)
+                {
+                    Uri redirectUri = response.Headers.Location;
+                    if (!redirectUri.IsAbsoluteUri)
+                    {
+                        redirectUri = new Uri(request.RequestUri.GetLeftPart(UriPartial.Authority) + redirectUri);
+                    }
+                    return GetString(redirectUri);
+                }
+
+                if (statusCode == 200)
+                {
+                    using var content = response.Content;
+                    data = content.ReadAsStringAsync().Result;
+                }               
             }
 
-            var data = string.Empty;
-            using (var client = new WebClient())
-            {
-                data = client.DownloadString(uri);
-            }
             return data;
         }
     }

@@ -2,7 +2,7 @@
   "profiles": {
     "RobotsTxt.Checker": {
       "commandName": "Project",
-      "commandLineArgs": "--webappurls dobryak.org"
+      "commandLineArgs": "--webappurls careers.wolterskluwer.com"
     }
   }
 }
