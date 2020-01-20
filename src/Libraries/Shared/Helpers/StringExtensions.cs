@@ -13,7 +13,30 @@ namespace Shared.Helpers
         /// <returns></returns>
         public static string CreateValidHostHeader(this string hostname)
         {
-            return null;
+            if (string.IsNullOrWhiteSpace(hostname))
+            {
+                return string.Empty;
+            }
+
+            Uri uri;
+            Uri.TryCreate(hostname.PrepareParceableHostName(), UriKind.Absolute, out uri);
+
+            return uri?.DnsSafeHost;
+        }
+
+        public static string PrepareParceableHostName(this string hostname)
+        {
+            var url = hostname.Trim();
+            if (url.StartsWith("://"))
+            {
+                url = string.Concat("https", url);
+            }
+            if (!url.ToLowerInvariant().StartsWith("http"))
+            {
+                url = string.Concat("https://", url);
+            }
+
+            return url;
         }
     }
 }
