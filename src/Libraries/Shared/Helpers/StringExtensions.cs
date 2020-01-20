@@ -19,12 +19,12 @@ namespace Shared.Helpers
             }
 
             Uri uri;
-            Uri.TryCreate(hostname.PrepareParceableHostName(), UriKind.Absolute, out uri);
+            Uri.TryCreate(hostname.PrepareParceableUri(), UriKind.Absolute, out uri);
 
             return uri?.DnsSafeHost;
         }
 
-        public static string PrepareParceableHostName(this string hostname)
+        public static string PrepareParceableUri(this string hostname)
         {
             var url = hostname.Trim();
             if (url.StartsWith("://"))

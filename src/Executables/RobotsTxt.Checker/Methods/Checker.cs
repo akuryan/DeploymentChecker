@@ -76,7 +76,7 @@ namespace RobotsTxt.Checker.Methods
         /// <returns></returns>
         private static Uri RobotsTxtUri(string suppliedHost)
         {
-            Uri parsedUri = new Uri(suppliedHost.PrepareParceableHostName());
+            Uri parsedUri = new Uri(suppliedHost.PrepareParceableUri());
 
             if (parsedUri == null)
             {

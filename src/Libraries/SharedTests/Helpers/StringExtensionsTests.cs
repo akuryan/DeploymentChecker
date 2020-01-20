@@ -28,11 +28,11 @@ namespace SharedTests.Helpers
         [TestCase("http://dobryak.org", "http://dobryak.org")]
         [TestCase("https://dobryak.org", "https://dobryak.org")]
         [TestCase("http://dobryak.org/test", "http://dobryak.org/test")]
-        [TestCase("http://dobryak.org/test?tse", "http://dobryak.org/test")]
+        [TestCase("http://dobryak.org/test?tse", "http://dobryak.org/test?tse")]
         [Test, Category("StringExtensions")]
         public void PrepareParceableHostNameTests(string suppliedData, string expectedResult)
         {
-            var parceableHost = suppliedData.PrepareParceableHostName();
+            var parceableHost = suppliedData.PrepareParceableUri();
             Assert.AreEqual(expectedResult, parceableHost);
         }
     }
