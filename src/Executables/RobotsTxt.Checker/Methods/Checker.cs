@@ -31,7 +31,7 @@ namespace RobotsTxt.Checker.Methods
             var robotsFile = robotsTxtExists ? Robots.Load(robotsContent) : Robots.Load(string.Empty);
             var getCheckStatus = GetCheckStatus(robotsFile, providedOptions.CrawlingDenied);
             var sitemapsIsAccessible = CheckSitemapIsAccessible(robotsFile);
-            if (robotsFile.Sitemaps.Any())
+            if (HaveSitemaps(robotsFile))
             {
                 //if robots.txt check is OK, but sitemaps, defined in it is not accessible - we shall fail the check
                 getCheckStatus = getCheckStatus ? sitemapsIsAccessible : getCheckStatus;
@@ -88,10 +88,20 @@ namespace RobotsTxt.Checker.Methods
             return new Uri(robotsTxtUrl, UriKind.Absolute);
         }
 
+        private static bool HaveSitemaps(Robots robotsFile)
+        {
+            if (robotsFile.Sitemaps != null)
+            {
+                return robotsFile.Sitemaps.Any();
+            }
+
+            return false;
+        }
+
         private static bool CheckSitemapIsAccessible(Robots robotsFile)
         {
             var isAccessible = false;
-            if (robotsFile.Sitemaps != null && robotsFile.Sitemaps.Any())
+            if (HaveSitemaps(robotsFile))
             {
                 foreach (Sitemap sitemapUrl in robotsFile.Sitemaps)
                 {

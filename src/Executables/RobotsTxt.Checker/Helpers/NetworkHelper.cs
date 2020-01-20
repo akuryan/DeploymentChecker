@@ -45,6 +45,11 @@ namespace RobotsTxt.Checker.Helpers
             {
                 var request = new HttpRequestMessage { RequestUri = uri, Method = HttpMethod.Get };
 
+                if (!string.IsNullOrWhiteSpace(hostHeader))
+                {
+                    request.Headers.Host = hostHeader.CreateValidHostHeader();
+                }
+
                 var response = httpClient.SendAsync(request).Result;
 
                 var statusCode = (int)response.StatusCode;
@@ -59,13 +64,11 @@ namespace RobotsTxt.Checker.Helpers
                     return GetString(redirectUri);
                 }
 
-                if (!string.IsNullOrWhiteSpace(hostHeader))
+                if (statusCode == 200)
                 {
-                    request.Headers.Host = hostHeader.CreateValidHostHeader();
-                }
-
-                response = httpClient.SendAsync(request).Result;
-                data = response.Content.ToString();
+                    using var content = response.Content;
+                    data = content.ReadAsStringAsync().Result;
+                }               
             }
 
             return data;
