@@ -47,7 +47,7 @@ namespace RobotsTxt.Checker
             {
                 exitWithError = !exitWithError ? !report.CheckStatus : exitWithError;
                 reportString.AppendLine(CheckStatusReport(report.CheckStatus, report.Url));
-                if (report.Robots.Sitemaps.Any())
+                if (report.Robots.Sitemaps != null && report.Robots.Sitemaps.Any())
                 {
                     var reportData = report.SitemapsIsAccessible ? " " : " not ";
                     reportString.AppendLine($"Sitemaps, defined at robots.txt at {report.Url} could{reportData}be downloaded.");
